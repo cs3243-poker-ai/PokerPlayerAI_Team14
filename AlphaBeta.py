@@ -1,7 +1,7 @@
 from gameTree import Tree
 class AlphaBeta:
     count_layer = 1
-    limit_layer = 2
+    limit_layer = 7
     factors = [0.2, 3]
     
     # print utility value of root node (assuming it is max)
