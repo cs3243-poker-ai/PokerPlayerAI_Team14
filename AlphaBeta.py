@@ -1,6 +1,6 @@
 class AlphaBeta:
     count_layer = 1
-    limit_layer = 7
+    limit_layer = 2
     factors = [0.2, 3]
     
     # print utility value of root node (assuming it is max)
@@ -8,6 +8,7 @@ class AlphaBeta:
     def __init__(self, game_tree):
         self.game_tree = game_tree  # GameTree
         self.root = game_tree.root  # GameNode
+        self.win_rate = 0
         return
 
     def set_limit(self, limit):
@@ -15,6 +16,7 @@ class AlphaBeta:
 
     def alpha_beta_search(self, node, win_rate):
         node.win_rate = win_rate
+        self.win_rate = win_rate
         infinity = float('inf')
         best_val = -infinity
         beta = infinity
@@ -22,8 +24,8 @@ class AlphaBeta:
         best_state = None
         for state in successors:
             # case for having host in successors
-            if "Host" in state.role:
-                return self.max_value(state, best_val, beta)
+            # if "Host" in state.role:
+            #     return self.max_value(state, best_val, beta)
             self.count_layer += 1
             value = self.min_value(state, best_val, beta)
             if value > best_val:
@@ -68,7 +70,7 @@ class AlphaBeta:
         for state in successors:
             self.count_layer += 1
             if "Host" in state.role:
-                value = min(value, self.min_value(state, alpha, beta))
+                value = min(value, self.max_value(state, alpha, beta)) # change from min_value to max_value
             else:
                 value = min(value, self.max_value(state, alpha, beta))
             if value <= alpha:
@@ -84,7 +86,14 @@ class AlphaBeta:
     # successor states in a game tree are the child nodes...
     def getSuccessors(self, node):
         assert node is not None
-        return filter(lambda c: c.action != "fold", node.children)
+        children = []
+        if "Host" not in node.role:
+            for child in node.children:
+                child.win_rate = self.win_rate
+                children.append(child)
+        else:
+            children = node.children
+        return filter(lambda c: c.action != "fold", children)
 
     # return true if the node has NO children (successor states)
     # return false if the node has children (successor states)
