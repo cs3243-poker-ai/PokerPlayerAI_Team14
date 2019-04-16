@@ -1,3 +1,4 @@
+from gameTree import Tree
 class AlphaBeta:
     count_layer = 1
     limit_layer = 2
@@ -93,7 +94,14 @@ class AlphaBeta:
                 child.win_rate = self.win_rate
                 children.append(child)
         else:
+            #generate children for host
+            estimation = self.game_tree.generate_host_win_rate(node)
             children = node.children
+            # for child in children: print child
+            # print estimation
+            assert len(estimation) == len(children)
+            for i in range(len(children)):
+                children[i].win_rate = estimation[i]
         return filter(lambda c: c.action != "fold", children)
 
     # return true if the node has NO children (successor states)

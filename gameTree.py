@@ -94,45 +94,18 @@ class Tree:
             return [fold_child, call_child]
         return [fold_child, call_child, raise_child]
 
-    # def generate_host_nodes(self, node):
-    #     import random
-    #     assert node.role == "BBHost" or node.role == "SBHost"
-    #     # all_combination = []
-    #     # if num == 2:
-    #     #     for i in range(3):
-    #     #         current_combination = random.sample([card for card in self.all_cards if card not in known], 3);
-    #     #         if current_combination not in all_combination:
-    #     #             all_combination.append(current_combination)
-    #     #     all_combination = list(map(lambda card: known + card, all_combination))
-    #     # else:
-    #     #     for i in range(3):
-    #     #         current_combination = random.sample([card for card in self.all_cards if card not in known], 1);
-    #     #         if current_combination not in all_combination:
-    #     #             all_combination.append(current_combination)
-    #     #     all_combination = list(map(lambda card: known + card, all_combination))
-    #     all_win_rates = [0.33, 0.55, 0.77]
-    #     children = []
-    #     role = "SB" if node.role == "BBHost" else "BB"
-    #     for win_rate in all_win_rates:
-    #         children.append(Node(role, node, node.SB_bet, node.BB_bet, node.card_known, 5 if node.card_count == 2 else (
-    #             node.card_count + 1), win_rate, "host", 0, node.SB_raise, node.BB_raise, node.depth_count + 1))
-    #     return children
     def generate_host_nodes(self, node):
+        all_win_rates = self.generate_host_win_rate(node)
+        children = []
+        role = "SB" if node.role == "BBHost" else "BB"
+        for win_rate in all_win_rates:
+            children.append(Node(role, node, node.SB_bet, node.BB_bet, node.card_known, 5 if node.card_count == 2 else (
+                node.card_count + 1), win_rate, "host", 0, node.SB_raise, node.BB_raise, node.depth_count + 1))
+        return children
+
+    def generate_host_win_rate(self, node):
         import random
         assert node.role == "BBHost" or node.role == "SBHost"
-        # all_combination = []
-        # if num == 2:
-        #     for i in range(3):
-        #         current_combination = random.sample([card for card in self.all_cards if card not in known], 3);
-        #         if current_combination not in all_combination:
-        #             all_combination.append(current_combination)
-        #     all_combination = list(map(lambda card: known + card, all_combination))
-        # else:
-        #     for i in range(3):
-        #         current_combination = random.sample([card for card in self.all_cards if card not in known], 1);
-        #         if current_combination not in all_combination:
-        #             all_combination.append(current_combination)
-        #     all_combination = list(map(lambda card: known + card, all_combination))
         oppo_actions = []
         current = node.parent
         while True:
@@ -145,13 +118,9 @@ class Tree:
                     current = current.parent
             else:
                 break
-
         default_win_rate = [0.25, 0.5, 0.75]
-
         influence_factor = 0.8 - (6 - node.card_count) * 0.12
-
         bias_factor = 1
-
         oppo_tendency = 1.2
         for item in oppo_actions:
             if item is "raise":
@@ -159,19 +128,12 @@ class Tree:
             else:
                 if bias_factor != 1:
                     oppo_tendency = 1 + (oppo_tendency - 1) * 0.7
-
         estimate_win_rate = []
         for item in default_win_rate:
-            estimation = (node.win_rate / bias_factor * influence_factor) + (1 - influence_factor) * item
+            estimation = (node.win_rate / bias_factor *
+                          influence_factor) + (1 - influence_factor) * item
             estimate_win_rate.append(estimation)
-
-        all_win_rates = estimate_win_rate
-        children = []
-        role = "SB" if node.role == "BBHost" else "BB"
-        for win_rate in all_win_rates:
-            children.append(Node(role, node, node.SB_bet, node.BB_bet, node.card_known, 5 if node.card_count == 2 else (
-                    node.card_count + 1), win_rate, "host", 0, node.SB_raise, node.BB_raise, node.depth_count + 1))
-        return children
+        return estimate_win_rate
 
     def generate_children(self, node):
         children = []
