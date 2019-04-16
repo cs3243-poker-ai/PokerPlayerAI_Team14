@@ -1,7 +1,7 @@
 class AlphaBeta:
     count_layer = 1
-    limit_layer = 3
-    factors = [0.9, 2]
+    limit_layer = 7
+    factors = [0.2, 3]
     
     # print utility value of root node (assuming it is max)
     # print names of all nodes visited during search
@@ -13,21 +13,26 @@ class AlphaBeta:
     def set_limit(self, limit):
         self.limit_layer = limit
 
-    def alpha_beta_search(self, node):
+
+    def alpha_beta_search(self, node, win_rate):
+        node.win_rate = win_rate
         infinity = float('inf')
         best_val = -infinity
         beta = infinity
         successors = self.getSuccessors(node)
         best_state = None
         for state in successors:
+            # case for having host in successors
+            if "Host" in state.role:
+                return self.max_value(state, best_val, beta)
             self.count_layer += 1
             value = self.min_value(state, best_val, beta)
             if value > best_val:
                 best_val = value
                 best_state = state
-#        print "AlphaBeta:  Utility Value of Root Node: = " + str(best_val)
-#        print "AlphaBeta:  Best State is: " + best_state.Name
-#        return best_state
+        #        print "AlphaBeta:  Utility Value of Root Node: = " + str(best_val)
+        #        print "AlphaBeta:  Best State is: " + best_state.Name
+        #        return best_state
         return best_state.action
 
     def max_value(self, node, alpha, beta):
@@ -40,10 +45,11 @@ class AlphaBeta:
         value = -infinity
         successors = self.getSuccessors(node)
         for state in successors:
-            if "Host" in state.role:
-                return self.max_value(state, alpha, beta)
             self.count_layer += 1
-            value = max(value, self.min_value(state, alpha, beta))
+            if "Host" in state.role:
+                value = max(value, self.max_value(state, alpha, beta))
+            else:
+                value = max(value, self.min_value(state, alpha, beta))
             if value >= beta:
                 self.count_layer -= 1
                 return value
@@ -61,10 +67,11 @@ class AlphaBeta:
         value = infinity
         successors = self.getSuccessors(node)
         for state in successors:
-            if "Host" in state.role:
-                return self.min_value(state, alpha, beta)
             self.count_layer += 1
-            value = min(value, self.max_value(state, alpha, beta))
+            if "Host" in state.role:
+                value = min(value, self.min_value(state, alpha, beta))
+            else:
+                value = min(value, self.max_value(state, alpha, beta))
             if value <= alpha:
                 self.count_layer -= 1
                 return value
@@ -78,7 +85,7 @@ class AlphaBeta:
     # successor states in a game tree are the child nodes...
     def getSuccessors(self, node):
         assert node is not None
-        return node.children
+        return filter(lambda c: c.action != "fold", node.children)
 
     # return true if the node has NO children (successor states)
     # return false if the node has children (successor states)
@@ -92,17 +99,19 @@ class AlphaBeta:
     def getUtility(self, role, node, factors):
         #assert node.role in ["SB", "BB"]
         #check whether player raise 5 times alr
+        factor1 = factors[0]
         raise_num = node.SB_raise if role == "BB" else node.BB_raise
         #check the last 5 actions
         #actions = get_actions(node, node.role, 5)
         if raise_num == 4:
-            last_action = 0
+            last_action = -0.5
         else:
             last_action = -1 if node.action == "raise" else 1
         #the total money on table
         my_money, op_money = node.SB_bet, node.BB_bet
-        if role == "BB": my_money, op_money = op_money, my_money
-        win_rate = node.win_rate
+        if role == "BB":
+            my_money, op_money = op_money, my_money
+        win_rate = node.win_rate + factor1 * last_action
         if node.action == "fold":
             win_rate = 0 if node.role != role else 1
             last_action = 0

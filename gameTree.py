@@ -12,7 +12,7 @@ class Node:
         self.children = []
         self.raise_count = raise_count
         self.description = self.role + " " + \
-            self.action + " " + str(self.card_known) + str(win_rate)
+            self.action + " " + str(self.card_known)
         self.SB_raise = SB_raise
         self.BB_raise = BB_raise
         self.depth_count = depth_count
@@ -77,10 +77,10 @@ class Tree:
     def generate_BB_children(self, node):
         fold_child = Node("SB", node, node.SB_bet, node.BB_bet, node.card_known, node.card_count, node.win_rate, "fold",
                           node.raise_count, node.SB_raise, node.BB_raise, node.depth_count + 1)
-        call_child = Node("SB", node, node.BB_bet, node.BB_bet, node.card_known, node.card_count, node.win_rate, "call",
+        call_child = Node("SB", node, node.SB_bet, node.SB_bet, node.card_known, node.card_count, node.win_rate, "call",
                           node.raise_count, node.SB_raise, node.BB_raise, node.depth_count + 1)
         raise_amount = 20 if node.card_count <= 5 else 40
-        raise_child = Node("SB", node, node.BB_bet + raise_amount, node.BB_bet, node.card_known, node.card_count, node.win_rate, "raise",
+        raise_child = Node("SB", node, node.SB_bet, node.SB_bet + raise_amount, node.card_known, node.card_count, node.win_rate, "raise",
                            node.raise_count + 1, node.SB_raise, node.BB_raise + 1, node.depth_count + 1)
         # condition for hosting, parent is not host node
         if node.parent is not None and node.parent.role not in ["SBHost", "BBHost"]:
@@ -88,7 +88,7 @@ class Tree:
                     and node.action == "call":
                 return []
             if node.card_count < 7:
-                call_child = Node("BBHost", node, node.BB_bet, node.BB_bet, node.card_known, node.card_count, node.win_rate, "call",
+                call_child = Node("BBHost", node, node.SB_bet, node.SB_bet, node.card_known, node.card_count, node.win_rate, "call",
                                   node.raise_count, node.SB_raise, node.BB_raise, node.depth_count + 1)
         if node.raise_count >= self.raise_limit or node.BB_raise >= self.raise_limit:
             return [fold_child, call_child]
@@ -165,14 +165,12 @@ class Tree:
             estimation = (node.win_rate / bias_factor * influence_factor) + (1 - influence_factor) * item
             estimate_win_rate.append(estimation)
 
-        #all_win_rates = [0.33, 0.55, 0.77]
-
         all_win_rates = estimate_win_rate
         children = []
         role = "SB" if node.role == "BBHost" else "BB"
         for win_rate in all_win_rates:
             children.append(Node(role, node, node.SB_bet, node.BB_bet, node.card_known, 5 if node.card_count == 2 else (
-                node.card_count + 1), win_rate, "host", 0, node.SB_raise, node.BB_raise, node.depth_count + 1))
+                    node.card_count + 1), win_rate, "host", 0, node.SB_raise, node.BB_raise, node.depth_count + 1))
         return children
 
     def generate_children(self, node):
@@ -195,7 +193,7 @@ class Tree:
         # for child in children: print child
         return new_children
 
-    def build_tree(self, limit=1000):
+    def build_tree(self):
         root = self.root
         children = self.generate_children(root)
         # leaves = []
@@ -206,10 +204,7 @@ class Tree:
             # print "this is current"
             # print current
             new_children = self.generate_children(current)
-            for child in new_children:
-                if child.depth_count < limit:
-                    children.append(child)
-            # children.extend(new_children)
+            children.extend(new_children)
             # print "this is new"
             # print new
             # for child in new_children:
