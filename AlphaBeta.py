@@ -102,7 +102,8 @@ class AlphaBeta:
             assert len(estimation) == len(children)
             for i in range(len(children)):
                 children[i].win_rate = estimation[i]
-        return filter(lambda c: c.action != "fold", children)
+        # return filter(lambda c: c.action != "fold", children)
+        return children
 
     # return true if the node has NO children (successor states)
     # return false if the node has children (successor states)
