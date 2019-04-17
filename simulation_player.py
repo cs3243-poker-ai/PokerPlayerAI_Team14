@@ -37,6 +37,7 @@ class ProbabilityPlayer(BasePokerPlayer):
                 # action_call = i["action"]
                 has_action_call = True
 
+        print "opp win rate:", wining_probability
         if wining_probability > 0.23 and has_action_raise == True:
             action = 'raise'
         elif has_action_call == True:

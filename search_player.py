@@ -32,7 +32,7 @@ class SearchPlayer(BasePokerPlayer):
 
 
   def declare_action(self, valid_actions, hole_card, round_state):
-
+    print valid_actions
     prob = self.get_probability(card_utils.gen_cards(hole_card), card_utils.gen_cards(round_state['community_card']))
     print prob
     for i in valid_actions:

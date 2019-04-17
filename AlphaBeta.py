@@ -1,8 +1,8 @@
 from gameTree import Tree
 class AlphaBeta:
     count_layer = 1
-    limit_layer = 7
-    factors = [0, 1]
+    limit_layer = 1
+    factors = [1.5, 0.2, 0.5]  # win_rate, raise_rate, last_action
 
     # print utility value of root node (assuming it is max)
     # print names of all nodes visited during search
@@ -10,13 +10,15 @@ class AlphaBeta:
         self.game_tree = game_tree  # GameTree
         self.root = game_tree.root  # GameNode
         self.win_rate = 0
+        self.opponent_num = 0
         return
 
     def set_limit(self, limit):
         self.limit_layer = limit
 
 
-    def alpha_beta_search(self, node, win_rate):
+    def alpha_beta_search(self, node, win_rate, opponent_num):
+        self.opponent_num = opponent_num
         node.win_rate = win_rate
         self.win_rate = win_rate
         infinity = float('inf')
@@ -50,7 +52,10 @@ class AlphaBeta:
         for state in successors:
             self.count_layer += 1
             if "Host" in state.role:
-                value = max(value, self.max_value(state, alpha, beta))
+                tmp = 0
+                for child in state.children:
+                    tmp += self.max_value(child, alpha, beta)
+                value = max(value, tmp / 3)
             else:
                 value = max(value, self.min_value(state, alpha, beta))
             if value >= beta:
@@ -72,7 +77,10 @@ class AlphaBeta:
         for state in successors:
             self.count_layer += 1
             if "Host" in state.role:
-                value = min(value, self.min_value(state, alpha, beta)) # change from min_value to max_value
+                tmp = 0
+                for child in state.children:
+                    tmp += self.min_value(child, alpha, beta)
+                value = min(value, tmp / 3)
             else:
                 value = min(value, self.max_value(state, alpha, beta))
             if value <= alpha:
@@ -103,7 +111,8 @@ class AlphaBeta:
             for i in range(len(children)):
                 children[i].win_rate = estimation[i]
 #        return filter(lambda c: c.action != "fold", children)
-        return children
+        import random
+        return random.sample(children, len(children))
 
     # return true if the node has NO children (successor states)
     # return false if the node has children (successor states)
@@ -118,19 +127,21 @@ class AlphaBeta:
         #assert node.role in ["SB", "BB"]
         #check whether player raise 5 times alr
         # factor1 = factors[0]
-        # raise_num = node.SB_raise if role == "BB" else node.BB_raise
+        raise_num = node.SB_raise if role == "BB" else node.BB_raise
+        raise_rate = -1 * (raise_num / self.opponent_num)
         #check the last 5 actions
         #actions = get_actions(node, node.role, 5)
-        # if raise_num == 4:
-        #     last_action = -0.5
-        # else:
-        #     last_action = -1 if node.action == "raise" else 1
+        if raise_num == 4:
+            last_action = -0.5
+        else:
+            last_action = -1 if node.action == "raise" else 0.2
         #the total money on table
         if role == "SB":
             my_money, op_money = node.SB_bet, node.BB_bet
         else:
             my_money, op_money = node.BB_bet, node.SB_bet
         win_rate = node.win_rate
+        win_rate = factors[0] * win_rate + factors[1] * raise_rate + factors[2] * last_action
         if node.action == "fold":
             win_rate = 0 if node.role != role else 1
             # last_action = 0

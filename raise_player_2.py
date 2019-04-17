@@ -4,7 +4,7 @@ from pypokerengine.utils.card_utils import gen_cards
 from gameTree import Node, Tree
 from AlphaBeta import AlphaBeta
 
-class RaisedPlayer(BasePokerPlayer):
+class RaisedPlayer2(BasePokerPlayer):
   def __init__(self):
       self.root = Node("SB", None, 10, 20, ["HA", "S5"], 2)
       self.tree = Tree(self.root)
@@ -28,6 +28,7 @@ class RaisedPlayer(BasePokerPlayer):
     elif len(round_state['action_histories']) == 4:
         actions = round_state['action_histories']['preflop'] + round_state['action_histories']['flop'] + \
                   round_state['action_histories']['turn'] + round_state['action_histories']['river']
+    raise_num = 0
     opponent_num = 0
     for action in actions:
       if action['action'] == 'FOLD':
@@ -41,13 +42,13 @@ class RaisedPlayer(BasePokerPlayer):
                   pos = 1
           self.current_node = self.current_node.children[1].children[pos] if "Host" in self.current_node.children[1].role else self.current_node.children[1]
       elif action['action'] == 'RAISE':
-          # print actions
+          print actions
           self.current_node = self.current_node.children[2]
-          # if action['uuid'] != self.my_uuid:
-          #     raise_num += 1
+          if action['uuid'] != self.my_uuid:
+              raise_num += 1
       if self.my_uuid != action['uuid']:
           opponent_num += 1
-    print self.tree.my_role, win_rate
+    print "opp role:", self.tree.my_role, "| opp win rate:", win_rate, "| ", raise_num, "@@"
     # print self.current_node
     final_action = self.alpha_beta.alpha_beta_search(self.current_node, win_rate, opponent_num)
     # print final_action, " !!!!!"
@@ -97,4 +98,4 @@ class RaisedPlayer(BasePokerPlayer):
     pass
 
 def setup_ai():
-  return RaisedPlayer()
+  return RaisedPlayer2()

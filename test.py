@@ -12,7 +12,7 @@ print "pruning"
 from AlphaBeta import AlphaBeta
 prun = AlphaBeta(tree)
 node = root.children[1]
-result = prun.alpha_beta_search(node, 0.509)
+result = prun.alpha_beta_search(node, 0.8, 1)
 # print prun.getUtility("SB", root.children[0], prun.factors)
 # print prun.getUtility("SB", root.children[1], prun.factors)
 # print prun.getUtility("SB", root.children[2], prun.factors)
