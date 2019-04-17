@@ -16,8 +16,11 @@ class AllRaisePlayer(BasePokerPlayer):
     #print("------------VALID_ACTIONS----------")
     #pp.pprint(valid_actions)
     #print("-------------------------------")
+<<<<<<< HEAD
     print "information of all_raise"
     print len(round_state["action_histories"]["preflop"])
+=======
+>>>>>>> 923b4eefec9714b8fe142d58554f254612e30c4f
     win_rate = estimate_hole_card_win_rate(1000, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
     # if win_rate <= 0.5:
     #   call_action_info = valid_actions[1]

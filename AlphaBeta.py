@@ -2,8 +2,7 @@ from gameTree import Tree
 class AlphaBeta:
     count_layer = 1
     limit_layer = 7
-    factors = [0.2, 3]
-    
+    factors = [0, 1]
     # print utility value of root node (assuming it is max)
     # print names of all nodes visited during search
     def __init__(self, game_tree):
@@ -72,7 +71,9 @@ class AlphaBeta:
         for state in successors:
             self.count_layer += 1
             if "Host" in state.role:
-                value = min(value, self.max_value(state, alpha, beta)) # change from min_value to max_value
+
+                value = min(value, self.min_value(state, alpha, beta)) # change from min_value to max_value
+
             else:
                 value = min(value, self.max_value(state, alpha, beta))
             if value <= alpha:
@@ -102,7 +103,7 @@ class AlphaBeta:
             assert len(estimation) == len(children)
             for i in range(len(children)):
                 children[i].win_rate = estimation[i]
-        # return filter(lambda c: c.action != "fold", children)
+#        return filter(lambda c: c.action != "fold", children)
         return children
 
     # return true if the node has NO children (successor states)
@@ -117,22 +118,24 @@ class AlphaBeta:
     def getUtility(self, role, node, factors):
         #assert node.role in ["SB", "BB"]
         #check whether player raise 5 times alr
-        factor1 = factors[0]
-        raise_num = node.SB_raise if role == "BB" else node.BB_raise
+        # factor1 = factors[0]
+        # raise_num = node.SB_raise if role == "BB" else node.BB_raise
         #check the last 5 actions
         #actions = get_actions(node, node.role, 5)
-        if raise_num == 4:
-            last_action = -0.5
-        else:
-            last_action = -1 if node.action == "raise" else 1
+        # if raise_num == 4:
+        #     last_action = -0.5
+        # else:
+        #     last_action = -1 if node.action == "raise" else 1
         #the total money on table
-        my_money, op_money = node.SB_bet, node.BB_bet
-        if role == "BB":
-            my_money, op_money = op_money, my_money
-        win_rate = node.win_rate + factor1 * last_action
+        if role == "SB":
+            my_money, op_money = node.SB_bet, node.BB_bet
+        else:
+            my_money, op_money = node.BB_bet, node.SB_bet
+        win_rate = node.win_rate
         if node.action == "fold":
             win_rate = 0 if node.role != role else 1
-            last_action = 0
-        expectation = (win_rate * (my_money + op_money) - my_money) / 10
-        result = sum(map(lambda x, y: x * y, factors, [last_action, expectation]))
-        return result
+            # last_action = 0
+        expectation = win_rate * (my_money + op_money) - my_money
+        # result = sum(map(lambda x, y: x * y, factors, [last_action, expectation]))
+        # return result
+        return expectation

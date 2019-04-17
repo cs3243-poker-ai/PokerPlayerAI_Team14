@@ -14,8 +14,11 @@ class RandomPlayer(BasePokerPlayer):
     #print("------------VALID_ACTIONS----------")
     #pp.pprint(valid_actions)
     #print("-------------------------------")
+<<<<<<< HEAD
     print "information of random"
     print len(round_state["action_histories"]["preflop"])
+=======
+>>>>>>> 923b4eefec9714b8fe142d58554f254612e30c4f
     r = rand.random()
     if r <= 0.5:
       call_action_info = valid_actions[1]
