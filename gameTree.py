@@ -44,7 +44,7 @@ class Tree:
     for p in pattern:
         for n in number:
             all_cards.append(p + n)
-    raise_limit = 4
+    raise_limit = 5
     my_role = ""
 
     def __init__(self, root=None):

@@ -1,7 +1,7 @@
 from gameTree import Tree
 class AlphaBeta:
     count_layer = 1
-    limit_layer = 1
+    limit_layer = 7
     factors = [1.5, 0.2, 0.5]  # win_rate, raise_rate, last_action
     # print utility value of root node (assuming it is max)
     # print names of all nodes visited during search
