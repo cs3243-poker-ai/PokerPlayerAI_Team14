@@ -43,6 +43,8 @@ class RatePlayer(BasePokerPlayer):
     pass
 
   def receive_game_update_message(self, action, round_state):
+    # print self.uuid
+    # print round_state["action_histories"]["preflop"]
     pass
 
   def receive_round_result_message(self, winners, hand_info, round_state):

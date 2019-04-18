@@ -1,8 +1,8 @@
 from gameTree import Tree
 class AlphaBeta:
     count_layer = 1
-    limit_layer = 7
-    factors = [1.5, 0.2, 0.5]  # win_rate, raise_rate, last_action
+    limit_layer = 1
+    factors = [2, 0.2, 0.5]  # win_rate, raise_rate, last_action
     # print utility value of root node (assuming it is max)
     # print names of all nodes visited during search
     def __init__(self, game_tree):
@@ -17,6 +17,7 @@ class AlphaBeta:
 
 
     def alpha_beta_search(self, node, win_rate, opponent_num):
+        assert node is not None
         self.opponent_num = opponent_num
         node.win_rate = win_rate
         self.win_rate = win_rate

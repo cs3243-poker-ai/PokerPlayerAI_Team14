@@ -16,6 +16,7 @@ class Node:
         self.SB_raise = SB_raise
         self.BB_raise = BB_raise
         self.depth_count = depth_count
+        self.weight = 1
 
     def add_child(self, *children):
         for child in children:
@@ -23,6 +24,14 @@ class Node:
 
     def add_children(self, children):
         self.children.extend(children)
+
+    def getChild(self, action):
+        if action == "host":
+            return self.children[0]
+        else:
+            for child in self.children:
+                if child.action == action:
+                    return child
 
     def add_depth(self):
         self.depth_count += 1
@@ -44,7 +53,7 @@ class Tree:
     for p in pattern:
         for n in number:
             all_cards.append(p + n)
-    raise_limit = 5
+    raise_limit = 4
     my_role = ""
 
     def __init__(self, root=None):

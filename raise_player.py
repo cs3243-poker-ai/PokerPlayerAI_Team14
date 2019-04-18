@@ -62,7 +62,6 @@ class RaisedPlayer(BasePokerPlayer):
     elif len(round_state['action_histories']['preflop']) == 3:
         my_role = "BB"
         self.my_uuid = round_state['action_histories']['preflop'][1]['uuid']
-        
     if len(round_state['action_histories']['preflop']) <= 3:
         # print round_state
         # print my_role, "!!!"
