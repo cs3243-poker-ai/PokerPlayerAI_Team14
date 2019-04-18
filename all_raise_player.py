@@ -7,24 +7,7 @@ import pprint
 class AllRaisePlayer(BasePokerPlayer):
 
   def declare_action(self, valid_actions, hole_card, round_state):
-    # valid_actions format => [raise_action_pp = pprint.PrettyPrinter(indent=2)
-    #pp = pprint.PrettyPrinter(indent=2)
-    #print("------------ROUND_STATE(RANDOM)--------")
-    #pp.pprint(round_state)
-    #print("------------HOLE_CARD----------")
-    #pp.pprint(hole_card)
-    #print("------------VALID_ACTIONS----------")
-    #pp.pprint(valid_actions)
-    #print("-------------------------------")
     win_rate = estimate_hole_card_win_rate(1000, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
-    # if win_rate <= 0.5:
-    #   call_action_info = valid_actions[1]
-    # elif r<= 0.9 and len(valid_actions ) == 3:
-    #   call_action_info = valid_actions[2]
-    # else:
-    #   call_action_info = valid_actions[0]
-    # action = call_action_info["action"]
-    # return action  # action returned here is sent to the poker engine
     if len(valid_actions) == 3:
         action = call_action_info = valid_actions[2]["action"]
     else:

@@ -7,6 +7,7 @@ from AlphaBeta import AlphaBeta
 class RaisedPlayer(BasePokerPlayer):
   start_stack = 0
   end_stack = 0
+  result = []
 
   def __init__(self):
       import cPickle
@@ -95,15 +96,17 @@ class RaisedPlayer(BasePokerPlayer):
   def receive_round_result_message(self, winners, hand_info, round_state):
     seats = round_state["seats"]
     self.end_stack = seats[0]["stack"] if seats[0]["uuid"] == self.uuid else seats[1]["stack"]
+    self.update_node_weight(self.current_node)
     # print self.end_stack
     # print self.current_node
     pass
 
   def update_node_weight(self, node):
     win_money = self.end_stack - self.start_stack
-    while node.parent != None:
+    self.result.append(win_money)
+    while node.parent != None and node.parent != "":
       node.weight += win_money / 1000
-
+      node = node.parent
 
 def setup_ai():
   return RaisedPlayer()
