@@ -2,3 +2,6 @@
 .idea/
 .idea/misc.xml
 .idea/workspace.xml
+pypokerengine/
+__pychache__/
+.ipynb_checkpoints/
