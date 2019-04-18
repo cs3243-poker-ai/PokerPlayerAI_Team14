@@ -5,13 +5,22 @@ from gameTree import Node, Tree
 from AlphaBeta import AlphaBeta
 
 class RaisedPlayer(BasePokerPlayer):
+  start_stack = 0
+  end_stack = 0
+
   def __init__(self):
-      self.root = Node("SB", None, 10, 20, ["HA", "S5"], 2)
-      self.tree = Tree(self.root)
-      self.tree.build_tree()
+      import cPickle
+      # self.root = Node("SB", None, 10, 20, ["HA", "S5"], 2)
+      # self.tree = Tree(self.root)
+      # self.tree.build_tree()
+      inf = open('tree.pkl')
+      self.tree = cPickle.load(inf)
+      self.root = self.tree.root
       self.alpha_beta = None
       self.seat = None
       self.my_uuid = None
+      self.current_node = self.root
+      
 
   def explore_game_tree(self, round_state, win_rate):
     # print round_state
@@ -41,8 +50,11 @@ class RaisedPlayer(BasePokerPlayer):
               elif win_rate > 0.33:
                   pos = 1
           self.current_node = self.current_node.children[1].children[pos] if "Host" in self.current_node.children[1].role else self.current_node.children[1]
-      elif action == 'RAISE':
+      elif action['action'] == 'RAISE':
           self.current_node = self.current_node.children[2]
+      # print "----------------------"
+      # print self.current_node
+      # print "----------------------"
     final_action = self.alpha_beta.alpha_beta_search(self.current_node, win_rate, opponent_num)
     return final_action
 
@@ -69,8 +81,9 @@ class RaisedPlayer(BasePokerPlayer):
   def receive_game_start_message(self, game_info):
     pass
   
-
   def receive_round_start_message(self, round_count, hole_card, seats):
+    self.start_stack = seats[0]["stack"] if seats[0]["uuid"] == self.uuid else seats[1]["stack"]
+    # print self.start_stack
     pass
 
   def receive_street_start_message(self, street, round_state):
@@ -80,7 +93,17 @@ class RaisedPlayer(BasePokerPlayer):
     pass
 
   def receive_round_result_message(self, winners, hand_info, round_state):
+    seats = round_state["seats"]
+    self.end_stack = seats[0]["stack"] if seats[0]["uuid"] == self.uuid else seats[1]["stack"]
+    # print self.end_stack
+    # print self.current_node
     pass
+
+  def update_node_weight(self, node):
+    win_money = self.end_stack - self.start_stack
+    while node.parent != None:
+      node.weight += win_money / 1000
+
 
 def setup_ai():
   return RaisedPlayer()

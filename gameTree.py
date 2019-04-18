@@ -40,7 +40,7 @@ class Node:
 
     def __str__(self):  # used for print node
         return ("role is " + self.role + " SB's bet is " + str(self.SB_bet) +
-                " BB's bet is " + str(self.BB_bet) + " card known = " + str(self.card_known) +
+                " BB's bet is " + str(self.BB_bet) + " card count = " + str(self.card_count) +
                 " action is " + self.action)
 
 

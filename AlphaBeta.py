@@ -57,10 +57,10 @@ class AlphaBeta:
             if "Host" in state.role:
                 tmp = 0
                 for child in state.children:
-                    tmp += self.max_value(child, alpha, beta)
+                    tmp += node.weight * self.max_value(child, alpha, beta)
                 value = max(value, tmp / 3)
             else:
-                value = max(value, self.min_value(state, alpha, beta))
+                value = max(value, node.weight * self.min_value(state, alpha, beta))
             if value >= beta:
                 self.count_layer -= 1
                 return value
