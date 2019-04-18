@@ -32,7 +32,6 @@ class Node:
             for child in self.children:
                 if child.action == action:
                     return child
-
     def add_depth(self):
         self.depth_count += 1
 

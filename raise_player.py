@@ -17,19 +17,20 @@ class RaisedPlayer(BasePokerPlayer):
     # print round_state
     self.current_node = self.root
     actions = []
-    # print len(round_state['action_histories']), "***"
-    if len(round_state['action_histories']) == 1:
+    if round_state['street'] == 'preflop':
         actions = round_state['action_histories']['preflop']
-    elif len(round_state['action_histories']) == 2:
+    elif round_state['street'] == 'flop':
         actions = round_state['action_histories']['preflop'] + round_state['action_histories']['flop']
-    elif len(round_state['action_histories']) == 3:
+    elif round_state['street'] == 'turn':
         actions = round_state['action_histories']['preflop'] + round_state['action_histories']['flop'] + \
                   round_state['action_histories']['turn']
-    elif len(round_state['action_histories']) == 4:
+    elif round_state['street'] == 'river':
         actions = round_state['action_histories']['preflop'] + round_state['action_histories']['flop'] + \
                   round_state['action_histories']['turn'] + round_state['action_histories']['river']
     opponent_num = 0
     for action in actions:
+      if self.my_uuid != action['uuid']:
+          opponent_num += 1
       if action['action'] == 'FOLD':
           self.current_node = self.current_node.children[0]
       elif action['action'] == 'CALL':
@@ -40,22 +41,13 @@ class RaisedPlayer(BasePokerPlayer):
               elif win_rate > 0.33:
                   pos = 1
           self.current_node = self.current_node.children[1].children[pos] if "Host" in self.current_node.children[1].role else self.current_node.children[1]
-      elif action['action'] == 'RAISE':
-          # print actions
+      elif action == 'RAISE':
           self.current_node = self.current_node.children[2]
-          # if action['uuid'] != self.my_uuid:
-          #     raise_num += 1
-      if self.my_uuid != action['uuid']:
-          opponent_num += 1
-    print self.tree.my_role, win_rate
-    # print self.current_node
     final_action = self.alpha_beta.alpha_beta_search(self.current_node, win_rate, opponent_num)
-    # print final_action, " !!!!!"
     return final_action
 
   def declare_action(self, valid_actions, hole_card, round_state):
-#    print "declare action!!!!"
-#     print round_state
+    fold_action, call_action, raise_action = list(map(lambda valid_action: valid_action['action'], valid_actions)) + [None] * (3 - len(valid_actions))
     if len(round_state['action_histories']['preflop']) == 2:
         my_role = "SB"
         self.my_uuid = round_state['action_histories']['preflop'][0]['uuid']
@@ -63,22 +55,16 @@ class RaisedPlayer(BasePokerPlayer):
         my_role = "BB"
         self.my_uuid = round_state['action_histories']['preflop'][1]['uuid']
     if len(round_state['action_histories']['preflop']) <= 3:
-        # print round_state
-        # print my_role, "!!!"
         self.tree.set_my_role(my_role)
-        # print my_role
         self.alpha_beta = AlphaBeta(self.tree)
-    # fold_action, raise_action, call_action = list(map(lambda valid_action: valid_action['action'], valid_actions)) + [None] * (3 - len(valid_actions))
     win_rate = estimate_hole_card_win_rate(1000, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
-    # print "my win rate: ", win_rate
-    # if win_rate < 0.25 and fold_action != None:
-    #     return fold_action
-    # # elif win_rate > 0.65 and raise_action != None:
-    # #     return raise_action
-    # else:
-#        return call_action
-#        remaining_actions = [raise_action, call_action]
-    return self.explore_game_tree(round_state, win_rate)
+    print self.tree.my_role, win_rate
+    if win_rate < 0.35 and fold_action is not None:
+        return fold_action
+    elif win_rate > 0.80 and raise_action is not None:
+        return raise_action
+    else:
+        return self.explore_game_tree(round_state, win_rate)
 
   def receive_game_start_message(self, game_info):
     pass

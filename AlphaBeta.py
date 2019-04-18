@@ -1,8 +1,9 @@
 from gameTree import Tree
 class AlphaBeta:
     count_layer = 1
-    limit_layer = 1
-    factors = [2, 0.2, 0.5]  # win_rate, raise_rate, last_action
+    limit_layer = 5
+    # factors = [0, 3]
+    factors = [1.5, 0.2, 0.5]
     # print utility value of root node (assuming it is max)
     # print names of all nodes visited during search
     def __init__(self, game_tree):
@@ -10,6 +11,8 @@ class AlphaBeta:
         self.root = game_tree.root  # GameNode
         self.win_rate = 0
         self.opponent_num = 0
+        self.init_node = None
+        self.opp_win_rate = 0
         return
 
     def set_limit(self, limit):
@@ -17,7 +20,7 @@ class AlphaBeta:
 
 
     def alpha_beta_search(self, node, win_rate, opponent_num):
-        assert node is not None
+        self.init_node = node
         self.opponent_num = opponent_num
         node.win_rate = win_rate
         self.win_rate = win_rate
@@ -102,7 +105,7 @@ class AlphaBeta:
                 child.win_rate = self.win_rate
                 children.append(child)
         else:
-            #generate children for host
+            # generate children for host
             estimation = self.game_tree.generate_host_win_rate(node)
             children = node.children
             # for child in children: print child
@@ -110,9 +113,10 @@ class AlphaBeta:
             assert len(estimation) == len(children)
             for i in range(len(children)):
                 children[i].win_rate = estimation[i]
-#        return filter(lambda c: c.action != "fold", children)
+        #        return filter(lambda c: c.action != "fold", children)
+        # return children
         import random
-        return random.sample(children, len(children))
+        return filter(lambda c: c.action != "fold", random.sample(children, len(children)))
 
     # return true if the node has NO children (successor states)
     # return false if the node has children (successor states)
@@ -124,19 +128,18 @@ class AlphaBeta:
 
 
     def getUtility(self, role, node, factors):
-        #assert node.role in ["SB", "BB"]
-        #check whether player raise 5 times alr
-        # factor1 = factors[0]
+
         raise_num = node.SB_raise if role == "BB" else node.BB_raise
         raise_rate = -1 * (raise_num / self.opponent_num)
-        #check the last 5 actions
-        #actions = get_actions(node, node.role, 5)
+        # check the last 5 actions
+        # actions = get_actions(node, node.role, 5)
         if raise_num == 4:
             last_action = -0.5
+        elif node.role == role and node.action == "raise":
+            last_action = -1
         else:
-            last_action = -1 if node.action == "raise" else 0.2
-        #the total money on table
-        prob = 1
+            last_action = 0
+        # the total money on table
         if role == "SB":
             my_money, op_money = node.SB_bet, node.BB_bet
         else:

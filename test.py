@@ -5,14 +5,23 @@ from gameTree import Node, Tree
 
 root = Node("SB", None, 10, 20, ["S2", "H3"], 2, 0)
 tree = Tree(root)
+<<<<<<< HEAD
 tree.set_my_role("BB")
+=======
+tree.set_my_role("SB")
+>>>>>>> 02258791f72cb31abc4d8727f08579df89aa3e04
 print "building"
 tree.build_tree()
 print "pruning"
 from AlphaBeta import AlphaBeta
 prun = AlphaBeta(tree)
+<<<<<<< HEAD
 node = root.children[1]
 result = prun.alpha_beta_search(node, 0.509)
+=======
+node = root
+result = prun.alpha_beta_search(node, 0.4, 1)
+>>>>>>> 02258791f72cb31abc4d8727f08579df89aa3e04
 # print prun.getUtility("SB", root.children[0], prun.factors)
 # print prun.getUtility("SB", root.children[1], prun.factors)
 # print prun.getUtility("SB", root.children[2], prun.factors)
