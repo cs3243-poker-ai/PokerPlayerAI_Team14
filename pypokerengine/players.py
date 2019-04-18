@@ -1,3 +1,5 @@
+import time
+
 class BasePokerPlayer(object):
   """Base Poker client implementation
 
@@ -45,7 +47,15 @@ class BasePokerPlayer(object):
   def respond_to_ask(self, message):
     """Called from Dealer when ask message received from RoundManager"""
     valid_actions, hole_card, round_state = self.__parse_ask_message(message)
-    return self.declare_action(valid_actions, hole_card, round_state)
+    action =  self.declare_action(valid_actions, hole_card, round_state)
+    for va in valid_actions:
+      if action == va['action'] :
+        return action
+    # print('[BUGFIX-TA] : Action Called %s, valid actions : '%action)
+    # print(valid_actions)
+    # time.sleep(10)
+    return 'fold'
+    #raise ValueError('Invalid Action Called')
 
   def receive_notification(self, message):
     """Called from Dealer when notification received from RoundManager"""
