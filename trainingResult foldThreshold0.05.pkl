@@ -1,0 +1,3 @@
+S'foldThreshold value:0.05aveResult:11200'
+p1
+.

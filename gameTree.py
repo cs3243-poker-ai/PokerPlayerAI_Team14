@@ -1,6 +1,6 @@
 class Node:
 
-    def __init__(self, role, parent=None, SB_bet=10, BB_bet=20, card_known=[], card_count=2, win_rate=0, action="", raise_count=0, SB_raise=0, BB_raise=0, depth_count=0):
+    def __init__(self, role, parent=None, SB_bet=10, BB_bet=20, card_known=[], card_count=2, win_rate=0, action="", raise_count=1, SB_raise=0, BB_raise=0, depth_count=0):
         self.role = role
         self.parent = parent
         self.SB_bet = SB_bet
@@ -105,7 +105,8 @@ class Tree:
     def generate_host_nodes(self, node):
         all_win_rates = self.generate_host_win_rate(node)
         children = []
-        role = "SB" if node.role == "BBHost" else "BB"
+        # role = "SB" if node.role == "BBHost" else "BB"
+        role = "SB"
         for win_rate in all_win_rates:
             children.append(Node(role, node, node.SB_bet, node.BB_bet, node.card_known, 5 if node.card_count == 2 else (
                 node.card_count + 1), win_rate, "host", 0, node.SB_raise, node.BB_raise, node.depth_count + 1))

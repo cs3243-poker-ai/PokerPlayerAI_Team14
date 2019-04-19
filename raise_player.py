@@ -45,6 +45,7 @@ class RaisedPlayer(BasePokerPlayer):
           opponent_num += 1
       if action['action'] == 'FOLD':
           self.current_node = self.current_node.children[0]
+        #  assert self.current_node.action == "fold"
       elif action['action'] == 'CALL':
           pos = 0
           if "Host" in self.current_node.children[1].role:
@@ -52,9 +53,11 @@ class RaisedPlayer(BasePokerPlayer):
                   pos = 2
               elif win_rate > 0.33:
                   pos = 1
-          self.current_node = self.current_node.children[1].children[pos] if "Host" in self.current_node.children[1].role else self.current_node.children[1]
+          self.current_node = self.current_node.children[1].children[1] if "Host" in self.current_node.children[1].role else self.current_node.children[1]
+        #  assert self.current_node.action in ["host", "call"]
       elif action['action'] == 'RAISE':
-          self.current_node = self.current_node.children[2]
+          self.current_node = self.current_node.children[-1]
+          # assert self.current_node.action == "raise"
       # print "----------------------"
       # print self.current_node
       # print "----------------------"
@@ -72,14 +75,16 @@ class RaisedPlayer(BasePokerPlayer):
     if len(round_state['action_histories']['preflop']) <= 3:
         self.tree.set_my_role(my_role)
         self.alpha_beta = AlphaBeta(self.tree)
-    win_rate = estimate_hole_card_win_rate(500, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
-    print self.tree.my_role, win_rate
+    win_rate = estimate_hole_card_win_rate(1000, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
+    print self.tree.my_role, win_rate, self.foldThreshold
     if win_rate < self.foldThreshold and fold_action is not None:
         return fold_action
     elif win_rate > self.raiseThreshold and raise_action is not None:
         return raise_action
     else:
-        return self.explore_game_tree(round_state, win_rate)
+        action = self.explore_game_tree(round_state, win_rate)
+        print "in the tree get " + str(action)
+        return action
 
   def receive_game_start_message(self, game_info):
     pass

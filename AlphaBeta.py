@@ -29,6 +29,8 @@ class AlphaBeta:
         beta = infinity
         successors = self.getSuccessors(node)
         best_state = None
+        if successors == None or len(successors) == 0:
+            return node.action
         for state in successors:
             # case for having host in successors
             # if "Host" in state.role:
@@ -116,7 +118,8 @@ class AlphaBeta:
         #        return filter(lambda c: c.action != "fold", children)
         # return children
         import random
-        return filter(lambda c: c.action != "fold", random.sample(children, len(children)))
+        # return filter(lambda c: c.action != "fold", random.sample(children, len(children)))
+        return filter(lambda c: c.action != "fold", children)
 
     # return true if the node has NO children (successor states)
     # return false if the node has children (successor states)
