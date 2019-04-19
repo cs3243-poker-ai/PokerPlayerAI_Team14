@@ -13,4 +13,5 @@
 import cPickle
 inf = open('result49.pkl')
 data = cPickle.load(inf)
-print data
+import matplotlib.pyplot as plt
+plt.show(data)

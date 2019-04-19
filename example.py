@@ -18,8 +18,8 @@ for i in range(20):
 	game_result = start_poker(config, verbose=1)
 	print RaisedPlayer.root
 	import cPickle
-	result = open('result' + str(i) + '.pkl', 'w')
-	cPickle.dump(RaisedPlayer.result, result)
+	# result = open('result' + str(i) + '.pkl', 'w')
+	# cPickle.dump(RaisedPlayer.result, result)
 	print RaisedPlayer.result
 	ouf = open('tree.pkl', 'w')
 	cPickle.dump(RaisedPlayer.tree, ouf)
