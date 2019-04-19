@@ -11,7 +11,7 @@ from simulation_player import ProbabilityPlayer
 RaisedPlayer = RaisedPlayer()
 
 for i in range(20):
-	config = setup_config(max_round=200, initial_stack=10000, small_blind_amount=10)
+	config = setup_config(max_round=10, initial_stack=10000, small_blind_amount=10)
 	config.register_player(name="runable", algorithm=RaisedPlayer)
 	config.register_player(name="allraise", algorithm=AllRaisePlayer())
 	#TODO:config the config as our wish

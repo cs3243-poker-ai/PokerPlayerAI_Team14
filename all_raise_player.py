@@ -7,7 +7,7 @@ import pprint
 class AllRaisePlayer(BasePokerPlayer):
 
   def declare_action(self, valid_actions, hole_card, round_state):
-    win_rate = estimate_hole_card_win_rate(1000, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
+    win_rate = estimate_hole_card_win_rate(500, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
     if len(valid_actions) == 3:
         action = call_action_info = valid_actions[2]["action"]
     else:
