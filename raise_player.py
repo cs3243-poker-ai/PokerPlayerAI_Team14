@@ -8,15 +8,17 @@ class RaisedPlayer(BasePokerPlayer):
   start_stack = 0
   end_stack = 0
   result = []
+  foldThreshold = 0.35
+  raiseThreshold = 0.8
 
   def __init__(self):
       import cPickle
-      # self.root = Node("SB", None, 10, 20, ["HA", "S5"], 2)
-      # self.tree = Tree(self.root)
-      # self.tree.build_tree()
-      inf = open('tree.pkl')
-      self.tree = cPickle.load(inf)
-      self.root = self.tree.root
+      self.root = Node("SB", None, 10, 20, ["HA", "S5"], 2)
+      self.tree = Tree(self.root)
+      self.tree.build_tree()
+#      inf = open('tree.pkl')
+#      self.tree = cPickle.load(inf)
+#      self.root = self.tree.root
       self.alpha_beta = None
       self.seat = None
       self.my_uuid = None
@@ -70,11 +72,11 @@ class RaisedPlayer(BasePokerPlayer):
     if len(round_state['action_histories']['preflop']) <= 3:
         self.tree.set_my_role(my_role)
         self.alpha_beta = AlphaBeta(self.tree)
-    win_rate = estimate_hole_card_win_rate(1000, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
+    win_rate = estimate_hole_card_win_rate(500, 2, gen_cards(hole_card), gen_cards(round_state['community_card']))
     print self.tree.my_role, win_rate
-    if win_rate < 0.35 and fold_action is not None:
+    if win_rate < self.foldThreshold and fold_action is not None:
         return fold_action
-    elif win_rate > 0.80 and raise_action is not None:
+    elif win_rate > self.raiseThreshold and raise_action is not None:
         return raise_action
     else:
         return self.explore_game_tree(round_state, win_rate)
